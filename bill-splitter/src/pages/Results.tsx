@@ -13,25 +13,40 @@ const Results = () => {
     receiptItems: { id: number; description: string; price: number }[];
   };
 
+  // Define the type for totalsByPerson and totals to ensure type safety
+  type TotalsType = { [name: string]: number };
+
   const [totalsByPerson, setTotalsByPerson] = useState<{
     [name: string]: string;
   }>({});
 
   useEffect(() => {
-    console.log('People:', people);
-    console.log('Item Assignments:', itemAssignments);
-    console.log('Items:', items);
-    const totals = {};
+    const totals: TotalsType = {};
     for (const person of people) {
-      totals[person.name] = 0;
-    }
-    for (const [itemId, personId] of Object.entries(itemAssignments)) {
-      const item = items.find((item) => item.id === Number(itemId));
-      const person = people.find((person) => person.id === personId);
-      totals[person.name] += item.price;
+      totals[person.name] = 0; // Initialize each person's total to 0
     }
 
-    setTotalsByPerson(totals);
+    // Safely calculate totals using the item and person mappings
+    for (const [itemId, personId] of Object.entries(itemAssignments)) {
+      const item = items.find((item) => item.id === Number(itemId));
+      if (item) {
+        const person = people.find((person) => person.id === personId);
+        if (person && totals.hasOwnProperty(person.name)) {
+          totals[person.name] += item.price;
+        }
+      }
+    }
+
+    // Format the totals for display
+    const formattedTotals = Object.keys(totals).reduce(
+      (acc: { [name: string]: string }, name) => {
+        acc[name] = `$${totals[name].toFixed(2)}`;
+        return acc;
+      },
+      {}
+    );
+
+    setTotalsByPerson(formattedTotals);
   }, [people, itemAssignments, items]);
 
   return (
