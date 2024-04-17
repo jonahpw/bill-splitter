@@ -44,7 +44,10 @@ const ItemAssigner: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    navigate('/results', { state: { people, itemAssignments } });
+    console.log('People:', people);
+    console.log('Receipt Items:', receiptItems);
+    console.log('Item Assignments:', itemAssignments);
+    navigate('/results', { state: { people, receiptItems, itemAssignments } });
   };
 
   return (
